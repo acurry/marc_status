@@ -1,8 +1,8 @@
 # MarcStatus
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/marc_status`. To experiment with that code, run `bin/console` for an interactive prompt.
+A set of tools to fetch and sort MARC train status data.
 
-TODO: Delete this and the text above, and describe your gem
+**This is currently in active development and is not feature-complete.**
 
 ## Installation
 
@@ -22,7 +22,11 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+require 'marc_status'
+
+train_statuses = MarcStatus.find_line_train_statuses(:penn_south)
+```
 
 ## Development
 
@@ -33,7 +37,6 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/marc_status.
-
 
 ## License
 
