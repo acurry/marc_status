@@ -21,35 +21,41 @@ module MarcStatus
 
   MAX_TIMEOUT = 10
 
-  # @return [String]
-  def as_html(status_url_fragment = STATUS_URL_FRAGMENT)
-    html = ''
+  class << self
+    # @return [String]
+    def as_html(status_url_fragment = STATUS_URL_FRAGMENT)
+      html = ''
 
-    Timeout::timeout(MAX_TIMEOUT) do
-      response = connection.get(status_url_fragment)
-      return response.body.to_s
+      Timeout::timeout(MAX_TIMEOUT) do
+        response = connection.get(status_url_fragment)
+        return response.body.to_s
+      end
+
+      html
     end
 
-    html
-  end
+    def method_missing(method, *args, &block)
+      super(method, *args, *block) unless line = respond_to?(method)
 
-  def method_missing(symbol, *args, &block)
-    super(symbol, *args, *block) unless line = /get_(.*)_status/.match(symbol)
-
-    send(:status_for_line, line[1])
-  end
-
-  private
-
-  def connection
-    @conn ||= Faraday.new(:url => BASE_URL) do |faraday|
-      faraday.adapter  Faraday.default_adapter
+      send(:status_for_line, line[1])
     end
-  end
 
-  def status_for_line(line)
-    fragment = "#{STATUS_URL_FRAGMENT}?line=#{LINE_STATUS_INDICES[line.to_sym]}"
+    def respond_to?(method, include_private = false)
+      /get_(.*)_status/.match(method) || false
+    end
 
-    as_html(fragment)
+    private
+
+    def connection
+      @conn ||= Faraday.new(:url => BASE_URL) do |faraday|
+        faraday.adapter  Faraday.default_adapter
+      end
+    end
+
+    def status_for_line(line)
+      fragment = "#{STATUS_URL_FRAGMENT}?line=#{LINE_STATUS_INDICES[line.to_sym]}"
+
+      as_html(fragment)
+    end
   end
 end
