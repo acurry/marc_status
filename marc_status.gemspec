@@ -1,7 +1,7 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'marc_status/version'
+require 'marc_status'
 
 Gem::Specification.new do |spec|
   spec.name          = "marc_status"
@@ -32,4 +32,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop"
 
   spec.add_runtime_dependency "faraday"
+  spec.add_runtime_dependency "nokogiri"
 end

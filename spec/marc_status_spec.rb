@@ -12,9 +12,9 @@ describe MarcStatus do
     'get_brunswick_west_status',
     'get_penn_north_status',
     'get_penn_south_status'
-    ].each do |method|
-      it "responds to #{method}" do
-        expect(MarcStatus.respond_to?(method)).to be_truthy
-      end
+  ].each do |method|
+    it "responds to #{method}" do
+      expect(MarcStatus.respond_to?(method)).to be_truthy
     end
+  end
 end

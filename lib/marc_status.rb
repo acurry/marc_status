@@ -1,5 +1,6 @@
 require 'timeout'
 require 'faraday'
+require 'nokogiri'
 
 module MarcStatus
   ###############
@@ -21,6 +22,9 @@ module MarcStatus
 
   MAX_TIMEOUT = 10
 
+  LINE_CLASS_SELECTOR = 'textStatusLine'.freeze
+  LINE_TRAIN_STATUS_CLASS_SELECTOR = 'textStatusAll'.freeze
+
   class << self
     # @return [String]
     def as_html(status_url_fragment = STATUS_URL_FRAGMENT)
@@ -32,6 +36,28 @@ module MarcStatus
       end
 
       html
+    end
+
+
+    #
+    # Given raw HTML and a line, i.e. :camden_north,
+    # find xpath <tr> rows with raw train info for each active train
+    # on that line.
+    # @param html [String] raw HTML from a MARC status page
+    # @param line [String/Symbol] the MARC train line to find, i.e.,
+    # :camden_north or 'camden_north'
+    #
+    # @return [Nokogiri::XML::NodeSet]
+    def find_line_train_statuses(line, html = as_html)
+      display_line = format_line(line)
+
+      n = Nokogiri::HTML(html)
+
+      status_rows_xpath =
+        "//td[contains(@class, '#{LINE_CLASS_SELECTOR}') and contains(., '#{display_line}')]" /
+        "/parent::tr/following-sibling::tr[contains(@class, '#{LINE_TRAIN_STATUS_CLASS_SELECTOR}')]"
+
+      n.xpath(status_rows_xpath)
     end
 
     def method_missing(method, *args, &block)
@@ -56,6 +82,15 @@ module MarcStatus
       fragment = "#{STATUS_URL_FRAGMENT}?line=#{LINE_STATUS_INDICES[line.to_sym]}"
 
       as_html(fragment)
+    end
+
+    #
+    # Convert a line as as ymbol to the format found in the actual MARC status page.
+    # @param line [Symbol] the line as a symbol, i.e., :camden_north
+    #
+    # @return [String] the line in display format, i.e., 'CAMDEN NORTH'
+    def format_line(line)
+      line.to_s.upcase.gsub('_', ' ')
     end
   end
 end
